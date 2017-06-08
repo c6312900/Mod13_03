@@ -1,0 +1,63 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/jquery-3.1.1.js"></script>
+    <script>
+
+        $(function () {
+
+            //1, 按下連線按鈕
+            $("#btnConnect").click(function () {
+                //2, 聊天室服務的網址以及使用者暱稱
+                var url = "ws://localhost:2509/api/chat?username=" + $("#username").val();
+                //3, 停用連線按鈕
+                this.disabled = true;
+                //4, 建立Web Scoket連線
+                var ws = new WebSocket(url);
+
+                //11, 將聊天的內容送到Server
+                $("#btnSend").click(function () {
+                    ws.send($("#message").val());
+                });
+
+                //7, 連線成功或失敗
+                ws.onopen = function () {
+                    //8, 成功的話順便送出使用者進入聊天室的訊息
+                    ws.send("進入聊天室...");
+                };
+                ws.onerror = function (e) {
+                    alert(e.message);
+                }
+
+                //10,13, 收到Server廣播的訊息，將訊息秀在畫面上
+                ws.onmessage = function (e) {
+                    $("#output").append($("<li>").text(e.data));
+                    //console.log("message");
+                }
+            });
+
+
+        });
+
+    </script>
+</head>
+<body>
+    <div> 
+        暱稱 : <input type="text" id="username" value="John" />
+        <input type="button" id="btnConnect" value="進入聊天室" />
+        <hr />
+        訊息 : <input type="text" id="message" value="Hello" />
+        <input type="button" id="btnSend" value="送出" />
+
+        <ul id="output"></ul>
+    </div>
+</body>
+</html>
